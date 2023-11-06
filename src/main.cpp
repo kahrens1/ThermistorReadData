@@ -29,6 +29,8 @@
 
 int samples[NUMSAMPLES][NUMTHERM];
 unsigned long t;
+double prevTemp[NUMTHERM] = {};
+double currentTemp[NUMTHERM] = {};
 
 void setup(void) {
   Serial.begin(9600);
@@ -40,8 +42,7 @@ uint8_t i;
 uint8_t j;
 int  average[NUMTHERM];
 double  Rt;
-double prevTemp[NUMTHERM] = {};
-double currentTemp[NUMTHERM] = {};
+
 
   // take N samples in a row, with a slight delay
   for (i=0; i< NUMSAMPLES; i++) {
@@ -88,20 +89,28 @@ double currentTemp[NUMTHERM] = {};
     currentTemp[i] += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
     currentTemp[i] = 1.0 /currentTemp[i];                 // Invert
     currentTemp[i] -= 273.15;                         // convert absolute temp to C
+
+     
+     
     
     // Check to see if previous value changed by at least the amount defined in threshold to print it
     if(abs(currentTemp[i] - prevTemp[i]) >= THRESHOLD){
+      
+      Serial.println(currentTemp[i] - prevTemp[i]);
       Serial.print(i+1);
       Serial.print(" , ");
       Serial.print(currentTemp[i]);
       Serial.print(" , ");
       Serial.println(t / 1000);
+      prevTemp[i] = currentTemp[i];
+      
+      
     }
-    prevTemp[i] = currentTemp[i];
+    
 
  }
   
-  delay(1000);
+  delay(100);
 
 }
 
